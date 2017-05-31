@@ -8,7 +8,7 @@ try:
 except ImportError:
     import unittest
 
-from shell import CommandError, Shell, shell
+from sheller import CommandError, Shell, shell
 
 
 class ShellTestCase(unittest.TestCase):
@@ -16,7 +16,7 @@ class ShellTestCase(unittest.TestCase):
         super(ShellTestCase, self).setUp()
         self.test_dir = os.path.join('/tmp', 'python_shell')
         self.hello_path = os.path.join(self.test_dir, 'hello.txt')
-        self.sh = Shell()
+        self.sh = Shell(die=False, verbose=False)
 
         shutil.rmtree(self.test_dir, ignore_errors=True)
         os.makedirs(self.test_dir)
@@ -46,7 +46,7 @@ class ShellTestCase(unittest.TestCase):
         self.assertEqual(self.sh._split_command(['ls', '-alh']), ['ls', '-alh'])
 
     def test__handle_output_simple(self):
-        sh = Shell()
+        sh = Shell(verbose=False)
         self.assertEqual(sh._stdout, '')
         self.assertEqual(sh._stderr, '')
 
@@ -59,7 +59,7 @@ class ShellTestCase(unittest.TestCase):
         self.assertEqual(sh._stderr, 'Error: Please supply an arg.\n')
 
     def test__handle_output_norecord(self):
-        sh = Shell(record_output=False, record_errors=False)
+        sh = Shell(record_output=False, record_errors=False, verbose=False)
         self.assertEqual(sh._stdout, '')
         self.assertEqual(sh._stderr, '')
 
@@ -68,7 +68,7 @@ class ShellTestCase(unittest.TestCase):
         self.assertEqual(sh._stderr, '')
 
     def test__communicate(self):
-        def fake_communicate(input=None):
+        def fake_communicate(input=None, die=False, verbose=False):
             self.sh._popen.returncode = 1
             return ('whatever\n', 'An error')
 
@@ -143,17 +143,19 @@ class ShellTestCase(unittest.TestCase):
         self.assertEqual(output, ['Hello, world!'])
 
     def test_die(self):
-        sh = Shell(die=True)
+        sh = Shell(die=True, verbose=False)
         with self.assertRaises(CommandError):
             sh.run('ls /maybe/this/exists/on/windows/or/something/idk')
 
     def test_verbose(self):
         sh = Shell(verbose=True)
-        with mock.patch('shell.sys.stdout') as mock_stdout:
+        with mock.patch('sheller.sys.stdout') as mock_stdout:
             sh.run('ls')
             mock_stdout.write.assert_called_once_with(os.linesep.join(sh.output()) + os.linesep)
-        with mock.patch('shell.sys.stderr') as mock_stderr:
-            sh.run('ls /total/garbage/not/real/stuff')
+        with mock.patch('sheller.sys.stderr') as mock_stderr:
+            try:
+                sh.run('ls /total/garbage/not/real/stuff')
+            except CommandError:
+                pass
             mock_stderr.write.assert_called_once_with(os.linesep.join(sh.errors()) + os.linesep)
-
 
