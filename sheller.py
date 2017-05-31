@@ -1,13 +1,13 @@
 """
-shell
+sheller
 =====
 
-A better way to run shell commands in Python.
+An even better way to run shell commands in Python.
 
 If you just need to quickly run a command, you can use the ``shell`` shortcut
 function::
 
-    >>> from shell import shell
+    >>> from sheller import shell
     >>> ls = shell('ls')
     >>> for file in ls.output():
     ...     print file
@@ -15,12 +15,13 @@ function::
 
 If you need to extend the behavior, you can also use the ``Shell`` object::
 
-    >>> from shell import Shell
+    >>> from sheller import Shell
     >>> sh = Shell(has_input=True)
     >>> cat = sh.run('cat -u')
     >>> cat.write('Hello, world!')
-    >>> cat.output()
     ['Hello, world!']
+    >>> cat.code
+    0
 
 """
 import shlex
@@ -30,7 +31,7 @@ import sys
 
 __author__ = 'Daniel Lindsley'
 __license__ = 'New BSD'
-__version__ = (1, 0, 1)
+__version__ = (1, 0, 0)
 
 
 class ShellException(Exception):
@@ -54,7 +55,7 @@ class Shell(object):
 
     Optionally accepts a ``die`` parameter, which should be a boolean.
     If set to ``True``, raises a CommandError if the command exits with a
-    non-zero return code. (Default: ``False``)
+    non-zero return code. (Default: ``True``)
 
     Optionally accepts a ``has_input`` parameter, which should be a boolean.
     If set to ``True``, the command will wait to execute until you call the
@@ -74,10 +75,10 @@ class Shell(object):
 
     Optionally accepts a ``verbose`` parameter, which should be a boolean.
     If set to ``True``, prints stdout to stdout and stderr to stderr as
-    execution happens. (Default: ``False``)
+    execution happens. (Default: ``True``)
     """
-    def __init__(self, die=False, has_input=False, record_output=True,
-                 record_errors=True, strip_empty=True, verbose=False):
+    def __init__(self, die=True, has_input=False, record_output=True,
+                 record_errors=True, strip_empty=True, verbose=True):
         self.die = die
         self.has_input = has_input
         self.record_output = record_output
@@ -159,7 +160,7 @@ class Shell(object):
 
         Example::
 
-            >>> from shell import Shell
+            >>> from sheller import Shell
             >>> sh = Shell()
             >>> sh.run('ls -alh')
 
@@ -201,7 +202,7 @@ class Shell(object):
 
         Example::
 
-            >>> from shell import Shell
+            >>> from sheller import Shell
             >>> sh = Shell(has_input=True)
             >>> sh.run('cat -u')
             >>> sh.write('Hello world!')
@@ -221,7 +222,7 @@ class Shell(object):
 
         Example::
 
-            >>> from shell import Shell
+            >>> from sheller import Shell
             >>> sh = Shell()
             >>> sh.run('some_long_running_thing')
             >>> sh.kill()
@@ -246,7 +247,7 @@ class Shell(object):
 
         Example::
 
-            >>> from shell import Shell
+            >>> from sheller import Shell
             >>> sh = Shell()
             >>> sh.run('ls ~')
             >>> sh.output()
@@ -277,7 +278,7 @@ class Shell(object):
 
         Example::
 
-            >>> from shell import Shell
+            >>> from sheller import Shell
             >>> sh = Shell()
             >>> sh.run('ls /there-s-no-way-anyone/has/this/directory/please')
             >>> sh.errors()
@@ -297,8 +298,8 @@ class Shell(object):
         return lines
 
 
-def shell(command, die=False, has_input=False, record_output=True,
-          record_errors=True, strip_empty=True, verbose=False):
+def shell(command, die=True, has_input=False, record_output=True,
+          record_errors=True, strip_empty=True, verbose=True):
     """
     A convenient shortcut for running commands.
 
@@ -308,7 +309,7 @@ def shell(command, die=False, has_input=False, record_output=True,
 
     Optionally accepts a ``die`` parameter, which should be a boolean.
     If set to ``True``, raises a CommandError if the command exits with a
-    non-zero return code. (Default: ``False``)
+    non-zero return code. (Default: ``True``)
 
     Optionally accepts a ``has_input`` parameter, which should be a boolean.
     If set to ``True``, the command will wait to execute until you call the
@@ -328,13 +329,13 @@ def shell(command, die=False, has_input=False, record_output=True,
 
     Optionally accepts a ``verbose`` parameter, which should be a boolean.
     If set to ``True``, prints stdout to stdout and stderr to stderr as
-    execution happens. (Default: ``False``)
+    execution happens. (Default: ``True``)
 
     Returns the ``Shell`` instance, which has been run with the given command.
 
     Example::
 
-        >>> from shell import shell
+        >>> from sheller import shell
         >>> sh = shell('ls -alh *py')
         >>> sh.output()
         ['hello.py', 'world.py']
