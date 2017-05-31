@@ -146,22 +146,12 @@ class ShellTestCase(unittest.TestCase):
         sh = Shell(die=True, verbose=False)
         with self.assertRaises(CommandError):
             sh.run('ls /maybe/this/exists/on/windows/or/something/idk')
+        no_die = shell('ls /other/fake/stuff/for/sure', die=False, verbose=False)  # get the stderr
         try:
-            no_die = shell('ls /other/fake/stuff/for/sure')  # get the stderr
             sh.run('ls /other/fake/stuff/for/sure')
         except CommandError, e:
             self.assertEqual(e.code, 1)
             self.assertEqual(e.stderr, no_die.errors()[0] + os.linesep)
-
-    def test_verbose(self):
-        sh = Shell(verbose=True)
-        with mock.patch('shell.sys.stdout') as mock_stdout:
-            sh.run('ls')
-            mock_stdout.write.assert_called_once_with(os.linesep.join(sh.output()) + os.linesep)
-        with mock.patch('shell.sys.stderr') as mock_stderr:
-            sh.run('ls /total/garbage/not/real/stuff')
-            mock_stderr.write.assert_called_once_with(os.linesep.join(sh.errors()) + os.linesep)
-
 
     def test_verbose(self):
         sh = Shell(verbose=True)
@@ -174,14 +164,4 @@ class ShellTestCase(unittest.TestCase):
             except CommandError:
                 pass
             mock_stderr.write.assert_called_once_with(os.linesep.join(sh.errors()) + os.linesep)
-
-    def test_verbose(self):
-        sh = Shell(verbose=True)
-        with mock.patch('shell.sys.stdout') as mock_stdout:
-            sh.run('ls')
-            mock_stdout.write.assert_called_once_with(os.linesep.join(sh.output()) + os.linesep)
-        with mock.patch('shell.sys.stderr') as mock_stderr:
-            sh.run('ls /total/garbage/not/real/stuff')
-            mock_stderr.write.assert_called_once_with(os.linesep.join(sh.errors()) + os.linesep)
-
 
