@@ -5,14 +5,14 @@ except ImportError:
 
 
 setup(
-    name="shell",
-    version="1.0.1",
-    description="A better way to run shell commands in Python.",
+    name="sheller",
+    version="1.0.0",
+    description="An even better way to run shell commands in Python.",
     author='Daniel Lindsley',
     author_email='daniel@toastdriven.com',
     long_description=open('README.rst', 'r').read(),
     py_modules=[
-        'shell'
+        'sheller'
     ],
     classifiers=[
         'Development Status :: 5 - Production/Stable',
@@ -24,6 +24,6 @@ setup(
         'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 3',
     ],
-    url='http://github.com/toastdriven/shell',
+    url='http://github.com/brandones/shell',
     license='BSD'
 )
